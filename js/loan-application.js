@@ -1,5 +1,4 @@
 (function ($) {
-    var storageKey = 'loanApplicationData';
     var form = document.getElementById('loanApplicationForm');
 
     if (!form) {
@@ -16,51 +15,6 @@
         personal: { button: '#loanNextStep1', destination: 'employment-details.html' },
         employment: { button: '#loanNextStep2', destination: 'loan-details.html' }
     };
-    var data = {};
-
-    try {
-        data = JSON.parse(sessionStorage.getItem(storageKey) || '{}');
-    } catch (error) {
-        data = {};
-    }
-
-    function restoreFields() {
-        pageFields[page].forEach(function (fieldName) {
-            if (fieldName === 'gender') {
-                form.querySelectorAll('input[name="gender"]').forEach(function (radio) {
-                    radio.checked = radio.value === data.gender;
-                });
-                return;
-            }
-
-            var field = document.getElementById(fieldName);
-            if (field && data[fieldName] !== undefined) {
-                field.value = data[fieldName];
-            }
-        });
-    }
-
-    function storeFields() {
-        form.querySelectorAll('input, select, textarea').forEach(function (field) {
-            if (field.type === 'radio') {
-                if (field.checked) {
-                    data[field.name] = field.value;
-                }
-                return;
-            }
-
-            data[field.id] = field.value;
-        });
-
-        try {
-            sessionStorage.setItem(storageKey, JSON.stringify(data));
-        } catch (error) {
-            return false;
-        }
-
-        return true;
-    }
-
     function getErrorId(field) {
         return field.type === 'radio' ? field.name + 'Error' : field.id + 'Error';
     }
@@ -125,16 +79,13 @@
         return false;
     }
 
-    restoreFields();
-
     $(form).on('input change', 'input, select, textarea', function () {
         clearFieldError(this);
-        storeFields();
     });
 
     if (nextButtons[page]) {
         $(nextButtons[page].button).on('click', function () {
-            if (validateCurrentPage() && storeFields()) {
+            if (validateCurrentPage()) {
                 window.location.href = nextButtons[page].destination;
             }
         });
@@ -142,20 +93,18 @@
 
     if (page === 'employment') {
         $('#loanBackStep2').on('click', function () {
-            storeFields();
             window.location.href = 'loan-application.html';
         });
     }
 
     if (page === 'loan') {
         $('#loanBackStep3').on('click', function () {
-            storeFields();
             window.location.href = 'employment-details.html';
         });
 
         $(form).on('submit', function (event) {
             event.preventDefault();
-            if (validateCurrentPage() && storeFields()) {
+            if (validateCurrentPage()) {
                 $('#loanStep3').prop('hidden', true);
                 $('#loanApplicationSuccess').prop('hidden', false).trigger('focus');
             }
