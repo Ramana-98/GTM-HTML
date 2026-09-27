@@ -1,0 +1,89 @@
+.loan-step-indicator {
+    color: #656565;
+    margin-top: -18px;
+    margin-bottom: 28px;
+}
+
+.loan-step-section h3 {
+    color: #333;
+    font-size: 1.15rem;
+    margin-bottom: 24px;
+}
+
+.loan-step-section .form-control,
+.loan-step-section .custom-select {
+    margin-bottom: 20px;
+    border-radius: 0;
+    height: 50px;
+}
+
+.loan-step-section textarea.form-control {
+    height: auto;
+}
+
+.loan-field-error {
+    position: relative;
+    margin: -20px 0 20px;
+    padding: 14px 18px;
+    border-radius: 0 0 5px 5px;
+    background-color: #ff4b1b;
+    color: #fff;
+}
+
+.loan-field-error::before {
+    position: absolute;
+    top: -9px;
+    right: 16px;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid #ff4b1b;
+    border-left: 9px solid transparent;
+    content: "";
+}
+
+.loan-field-invalid {
+    border-color: #ff4b1b;
+}
+
+.loan-gender-group {
+    margin-bottom: 20px;
+}
+
+.loan-gender-group legend {
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.loan-gender-option {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 24px;
+}
+
+.loan-gender-option input {
+    margin-right: 8px;
+}
+
+.loan-gender-error {
+    margin-top: 8px;
+}
+
+.loan-success {
+    border-left: 4px solid #4b8b54;
+    padding: 8px 0 8px 20px;
+}
+
+.loan-success h3 {
+    color: #356b3d;
+    font-size: 1.25rem;
+}
+
+@media (max-width: 575.98px) {
+    body {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .tm-block {
+        padding: 32px 24px;
+    }
+}

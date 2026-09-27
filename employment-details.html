@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Loan Application - Dashboard</title>
+    <title>Employment Details - Loan Application</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600">
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -19,8 +19,11 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-K9BZP6LQ');</script>
 </head>
+</head>
 
-<body class="bg02" data-loan-page="personal">
+
+
+<body class="bg02" data-loan-page="employment">
     <div class="container">
         <div class="row">
             <div class="col-12">
@@ -51,7 +54,7 @@
                                     <a class="dropdown-item" href="#">Profile</a>
                                     <a class="dropdown-item" href="#">Billing</a>
                                     <a class="dropdown-item" href="#">Customize</a>
-                                    <a class="dropdown-item active" href="loan-application.html" aria-current="page">Loan Application</a>
+                                    <a class="dropdown-item active" href="loan-application.html">Loan Application</a>
                                 </div>
                             </li>
                         </ul>
@@ -73,33 +76,33 @@
                 <section class="bg-white tm-block">
                     <h2 class="tm-block-title">Loan Application</h2>
                     <form id="loanApplicationForm" novalidate>
-                        <div id="loanStep1" class="loan-step-section" aria-labelledby="loanStep1Title">
-                            <p class="loan-step-indicator">Step 1 of 3</p>
-                            <h3 id="loanStep1Title">Personal Information</h3>
+                        <div id="loanStep2" class="loan-step-section" aria-labelledby="loanStep2Title">
+                            <p class="loan-step-indicator">Step 2 of 3</p>
+                            <h3 id="loanStep2Title">Employment Details</h3>
                             <div class="form-group">
-                                <input class="form-control" type="text" id="fullName" name="fullName" placeholder="First name" aria-label="First name" aria-describedby="fullNameError" autocomplete="given-name" required>
-                                <p class="loan-field-error" id="fullNameError" role="alert" aria-live="polite" hidden></p>
+                                <select class="custom-select" id="employmentType" name="employmentType" aria-label="Employment Type" aria-describedby="employmentTypeError" required>
+                                    <option value="">Employment Type</option>
+                                    <option value="salaried">Salaried</option>
+                                    <option value="self-employed">Self-employed</option>
+                                    <option value="business">Business</option>
+                                </select>
+                                <p class="loan-field-error" id="employmentTypeError" role="alert" aria-live="polite" hidden></p>
                             </div>
                             <div class="form-group">
-                                <input class="form-control" type="email" id="email" name="email" placeholder="Email" aria-label="Email" aria-describedby="emailError" autocomplete="email" required>
-                                <p class="loan-field-error" id="emailError" role="alert" aria-live="polite" hidden></p>
+                                <input class="form-control" type="number" id="monthlyIncome" name="monthlyIncome" placeholder="Monthly Income" aria-label="Monthly Income" aria-describedby="monthlyIncomeError" min="1" step="0.01" required>
+                                <p class="loan-field-error" id="monthlyIncomeError" role="alert" aria-live="polite" hidden></p>
                             </div>
                             <div class="form-group">
-                                <input class="form-control" type="tel" id="mobile" name="mobile" placeholder="Mobile Number" aria-label="Mobile Number" aria-describedby="mobileError" autocomplete="tel" required>
-                                <p class="loan-field-error" id="mobileError" role="alert" aria-live="polite" hidden></p>
+                                <input class="form-control" type="text" id="companyName" name="companyName" placeholder="Company Name" aria-label="Company Name" aria-describedby="companyNameError" required>
+                                <p class="loan-field-error" id="companyNameError" role="alert" aria-live="polite" hidden></p>
                             </div>
                             <div class="form-group">
-                                <input class="form-control" type="date" id="dob" name="dob" placeholder="Date of Birth" aria-label="Date of Birth" aria-describedby="dobError" autocomplete="bday" required>
-                                <p class="loan-field-error" id="dobError" role="alert" aria-live="polite" hidden></p>
+                                <input class="form-control" type="number" id="workExperience" name="workExperience" placeholder="Work Experience (years)" aria-label="Work Experience (years)" aria-describedby="workExperienceError" min="0" step="0.1" required>
+                                <p class="loan-field-error" id="workExperienceError" role="alert" aria-live="polite" hidden></p>
                             </div>
-                            <fieldset class="loan-gender-group">
-                                <legend>Gender</legend>
-                                <label class="loan-gender-option" for="genderMale"><input type="radio" id="genderMale" name="gender" value="male">Male</label>
-                                <label class="loan-gender-option" for="genderFemale"><input type="radio" id="genderFemale" name="gender" value="female">Female</label>
-                                <p class="loan-field-error loan-gender-error" id="genderError" role="alert" aria-live="polite" hidden></p>
-                            </fieldset>
-                            <div class="text-right">
-                                <button class="btn btn-primary" type="button" id="loanNextStep1">Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i></button>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-secondary" type="button" id="loanBackStep2"><i class="fas fa-arrow-left mr-2" aria-hidden="true"></i>Back</button>
+                                <button class="btn btn-primary" type="button" id="loanNextStep2">Next <i class="fas fa-arrow-right ml-2" aria-hidden="true"></i></button>
                             </div>
                         </div>
                     </form>
@@ -116,7 +119,6 @@
             </div>
         </footer>
     </div>
-
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/loan-application.js"></script>
