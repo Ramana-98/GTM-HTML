@@ -5,16 +5,36 @@
         return;
     }
 
-    var page = document.body.getAttribute('data-loan-page');
     var pageFields = {
-        personal: ['fullName', 'email', 'mobile', 'dob', 'gender'],
-        employment: ['employmentType', 'monthlyIncome', 'companyName', 'workExperience'],
-        loan: ['loanType', 'loanAmount', 'loanTenure', 'loanPurpose']
+        1: ['fullName', 'email', 'mobile', 'dob', 'gender'],
+        2: ['employmentType', 'monthlyIncome', 'companyName', 'workExperience'],
+        3: ['loanType', 'loanAmount', 'loanTenure', 'loanPurpose']
     };
-    var nextButtons = {
-        personal: { button: '#loanNextStep1', destination: 'employment-details.html' },
-        employment: { button: '#loanNextStep2', destination: 'loan-details.html' }
-    };
+    var currentStep = 1;
+    var isTransitioning = false;
+
+    form.reset();
+
+    function showStep(step) {
+        currentStep = step;
+        [1, 2, 3].forEach(function (stepNumber) {
+            document.getElementById('loanStep' + stepNumber).hidden = stepNumber !== step;
+        });
+        document.getElementById('loanStep' + step + 'Title').focus();
+    }
+
+    function transitionToStep(step) {
+        if (isTransitioning) {
+            return;
+        }
+
+        isTransitioning = true;
+        window.setTimeout(function () {
+            showStep(step);
+            isTransitioning = false;
+        }, 300);
+    }
+
     function getErrorId(field) {
         return field.type === 'radio' ? field.name + 'Error' : field.id + 'Error';
     }
@@ -35,11 +55,11 @@
         }
     }
 
-    function validateCurrentPage() {
+    function validateCurrentStep() {
         var invalidField = null;
         var invalidName = '';
 
-        pageFields[page].some(function (fieldName) {
+        pageFields[currentStep].some(function (fieldName) {
             if (fieldName === 'gender') {
                 var genderSelected = form.querySelector('input[name="gender"]:checked');
                 if (!genderSelected) {
@@ -83,31 +103,31 @@
         clearFieldError(this);
     });
 
-    if (nextButtons[page]) {
-        $(nextButtons[page].button).on('click', function () {
-            if (validateCurrentPage()) {
-                window.location.href = nextButtons[page].destination;
-            }
-        });
-    }
+    $('#loanNextStep1').on('click', function () {
+        if (validateCurrentStep()) {
+            transitionToStep(2);
+        }
+    });
 
-    if (page === 'employment') {
-        $('#loanBackStep2').on('click', function () {
-            window.location.href = 'loan-application.html';
-        });
-    }
+    $('#loanBackStep2').on('click', function () {
+        transitionToStep(1);
+    });
 
-    if (page === 'loan') {
-        $('#loanBackStep3').on('click', function () {
-            window.location.href = 'employment-details.html';
-        });
+    $('#loanNextStep2').on('click', function () {
+        if (validateCurrentStep()) {
+            transitionToStep(3);
+        }
+    });
 
-        $(form).on('submit', function (event) {
-            event.preventDefault();
-            if (validateCurrentPage()) {
-                $('#loanStep3').prop('hidden', true);
-                $('#loanApplicationSuccess').prop('hidden', false).trigger('focus');
-            }
-        });
-    }
+    $('#loanBackStep3').on('click', function () {
+        transitionToStep(2);
+    });
+
+    $(form).on('submit', function (event) {
+        event.preventDefault();
+        if (validateCurrentStep()) {
+            $('#loanStep3').prop('hidden', true);
+            $('#loanApplicationSuccess').prop('hidden', false).trigger('focus');
+        }
+    });
 })(jQuery);
