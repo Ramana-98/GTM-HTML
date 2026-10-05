@@ -10,68 +10,14 @@
         2: ['employmentType', 'monthlyIncome', 'companyName', 'workExperience'],
         3: ['loanType', 'loanAmount', 'loanTenure', 'loanPurpose']
     };
-    var storageKey = 'loanApplicationDraft';
+    var reloadStepKey = 'loanApplicationReloadStep';
     var currentStep = 1;
     var isTransitioning = false;
 
-    form.reset();
-
-    function saveDraft(step) {
-        var values = {};
-        form.querySelectorAll('[name]').forEach(function (field) {
-            if (field.type === 'radio') {
-                if (field.checked) {
-                    values[field.name] = field.value;
-                }
-            } else {
-                values[field.name] = field.value;
-            }
-        });
-
-        try {
-            window.sessionStorage.setItem(storageKey, JSON.stringify({ step: step, values: values }));
-        } catch (error) {}
+    function isPageReload() {
+        var entries = window.performance.getEntriesByType('navigation');
+        return entries.length > 0 && entries[0].type === 'reload';
     }
-
-    function restoreDraft() {
-        var draft;
-        try {
-            draft = JSON.parse(window.sessionStorage.getItem(storageKey));
-        } catch (error) {
-            draft = null;
-        }
-
-        if (!draft || (draft.step !== 2 && draft.step !== 3) || !draft.values) {
-            try {
-                window.sessionStorage.removeItem(storageKey);
-            } catch (error) {}
-            return;
-        }
-
-        var previousStepFields = [];
-        for (var stepNumber = 1; stepNumber < draft.step; stepNumber++) {
-            previousStepFields = previousStepFields.concat(pageFields[stepNumber]);
-        }
-
-        Object.keys(draft.values).forEach(function (name) {
-            if (previousStepFields.indexOf(name) === -1) {
-                return;
-            }
-
-            var fields = form.querySelectorAll('[name="' + name + '"]');
-            fields.forEach(function (field) {
-                if (field.type === 'radio') {
-                    field.checked = field.value === draft.values[name];
-                } else {
-                    field.value = draft.values[name];
-                }
-            });
-        });
-        showStep(draft.step);
-        saveDraft(draft.step);
-    }
-
-    restoreDraft();
 
     function showStep(step) {
         currentStep = step;
@@ -81,12 +27,126 @@
         document.getElementById('loanStep' + step + 'Title').focus();
     }
 
+    function clearStepFields(step) {
+        pageFields[step].forEach(function (fieldName) {
+            form.querySelectorAll('[name="' + fieldName + '"]').forEach(function (field) {
+                if (field.type === 'radio') {
+                    field.checked = false;
+                } else {
+                    field.value = '';
+                }
+            });
+        });
+    }
+
+    function saveReloadValues(step) {
+        var values = {};
+
+        for (var stepNumber = 1; stepNumber < step; stepNumber++) {
+            pageFields[stepNumber].forEach(function (fieldName) {
+                form.querySelectorAll('[name="' + fieldName + '"]').forEach(function (field) {
+                    if (field.type === 'radio') {
+                        if (field.checked) {
+                            values[field.name] = field.value;
+                        }
+                    } else {
+                        values[field.name] = field.value;
+                    }
+                });
+            });
+        }
+
+        var state = window.history.state;
+        if (!state || typeof state !== 'object') {
+            state = {};
+        }
+        state.loanApplicationReload = { step: step, values: values };
+        window.history.replaceState(state, '');
+    }
+
+    function restoreReloadValues(values, step) {
+        if (!values) {
+            return;
+        }
+
+        for (var stepNumber = 1; stepNumber < step; stepNumber++) {
+            pageFields[stepNumber].forEach(function (fieldName) {
+                if (!Object.prototype.hasOwnProperty.call(values, fieldName)) {
+                    return;
+                }
+
+                form.querySelectorAll('[name="' + fieldName + '"]').forEach(function (field) {
+                    if (field.type === 'radio') {
+                        field.checked = field.value === values[fieldName];
+                    } else {
+                        field.value = values[fieldName];
+                    }
+                });
+            });
+        }
+    }
+
+    function restoreReloadStep() {
+        var step = null;
+        var reloadState = null;
+
+        try {
+            if (isPageReload()) {
+                step = Number(window.sessionStorage.getItem(reloadStepKey));
+                var currentHistoryState = window.history.state;
+                reloadState = currentHistoryState && currentHistoryState.loanApplicationReload;
+            }
+            window.sessionStorage.removeItem(reloadStepKey);
+            window.sessionStorage.removeItem('loanApplicationDraft');
+
+            var historyState = window.history.state;
+            if (historyState && typeof historyState === 'object' && historyState.loanApplicationReload) {
+                delete historyState.loanApplicationReload;
+                window.history.replaceState(historyState, '');
+            }
+        } catch (error) {
+            console.error('Unable to read or clear loan application reload state.', error);
+        }
+
+        if (step !== 2 && step !== 3) {
+            form.reset();
+            return;
+        }
+
+        if (reloadState && reloadState.step === step) {
+            restoreReloadValues(reloadState.values, step);
+        }
+        clearStepFields(step);
+        if (step === 2) {
+            clearStepFields(3);
+        }
+        showStep(step);
+    }
+
+    window.addEventListener('pagehide', function () {
+        var visibleStep = [1, 2, 3].filter(function (step) {
+            return !document.getElementById('loanStep' + step).hidden;
+        })[0];
+
+        try {
+            if (visibleStep) {
+                window.sessionStorage.setItem(reloadStepKey, String(visibleStep));
+            } else {
+                window.sessionStorage.removeItem(reloadStepKey);
+            }
+        } catch (error) {
+            console.error('Unable to save the visible loan application step for reload.', error);
+        }
+    });
+
+    window.addEventListener('pageshow', restoreReloadStep);
+
     function transitionToStep(step) {
         if (isTransitioning) {
             return;
         }
 
-        saveDraft(step);
+        saveReloadValues(step);
         isTransitioning = true;
         window.setTimeout(function () {
             showStep(step);
@@ -160,9 +220,6 @@
 
     $(form).on('input change', 'input, select, textarea', function () {
         clearFieldError(this);
-        if (currentStep > 1) {
-            saveDraft(currentStep);
-        }
     });
 
     $('#loanNextStep1').on('click', function () {
@@ -188,9 +245,6 @@
     $(form).on('submit', function (event) {
         event.preventDefault();
         if (validateCurrentStep()) {
-            try {
-                window.sessionStorage.removeItem(storageKey);
-            } catch (error) {}
             $('#loanStep3').prop('hidden', true);
             $('#loanApplicationSuccess').prop('hidden', false).trigger('focus');
         }
