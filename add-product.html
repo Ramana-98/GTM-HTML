@@ -277,15 +277,7 @@
 
                 event.preventDefault();
                 window.alert('Product successfully added!');
-                this.reset();
-                $('#expire_date').datepicker('setDate', null);
-                fields.forEach(function (field) {
-                    const error = document.getElementById(field.element.id + '-error');
-                    error.textContent = '';
-                    error.classList.remove('is-visible');
-                    field.element.classList.remove('is-invalid');
-                    field.element.removeAttribute('aria-invalid');
-                });
+                window.location.reload();
             });
         });
     </script>
