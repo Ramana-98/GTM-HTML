@@ -75,36 +75,88 @@
         </footer>
     </div>
     <script>
-        (function () {
-            sessionStorage.removeItem('dashboardAuthenticated');
+    (function () {
 
-            const form = document.getElementById('loginForm');
-            const fields = [document.getElementById('username'), document.getElementById('password')];
+        sessionStorage.removeItem('dashboardAuthenticated');
 
-            fields.forEach(function (field) {
-                field.addEventListener('input', function () {
-                    field.setCustomValidity('');
-                });
+        const form = document.getElementById('loginForm');
+
+        const fields = [
+            document.getElementById('username'),
+            document.getElementById('password')
+        ];
+
+        fields.forEach(function (field) {
+            field.addEventListener('input', function () {
+                field.setCustomValidity('');
+            });
+        });
+
+        form.addEventListener('submit', function (event) {
+
+            const emptyField = fields.find(function (field) {
+                return field.value.trim() === '';
             });
 
-            form.addEventListener('submit', function (event) {
-                const emptyField = fields.find(function (field) {
-                    return field.value.trim() === '';
-                });
+            /* =========================================
+               CHECK USERNAME AND PASSWORD
+               ========================================= */
 
-                if (emptyField) {
-                    event.preventDefault();
-                    emptyField.setCustomValidity('Please enter your ' + emptyField.name + '.');
-                    emptyField.reportValidity();
-                    return;
-                }
+            if (emptyField) {
 
                 event.preventDefault();
-                sessionStorage.setItem('dashboardAuthenticated', 'true');
-                window.location.assign('index.html');
+
+                emptyField.setCustomValidity(
+                    'Please enter your ' + emptyField.name + '.'
+                );
+
+                emptyField.reportValidity();
+
+                return;
+            }
+
+
+            /* =========================================
+               LOGIN SUCCESS
+               ========================================= */
+
+            event.preventDefault();
+
+            sessionStorage.setItem(
+                'dashboardAuthenticated',
+                'true'
+            );
+
+
+            /* =========================================
+               SEND LOGIN DATA TO GTM
+               ========================================= */
+
+            window.dataLayer = window.dataLayer || [];
+
+            window.dataLayer.push({
+
+                event: 'login',
+
+                loginStatus: 'success',
+
+                loginMessage: 'Login successful',
+
+                loginMethod: 'Username and Password'
+
             });
-        }());
-    </script>
+
+
+            /* =========================================
+               REDIRECT
+               ========================================= */
+
+            window.location.assign('index.html');
+
+        });
+
+    }());
+</script>
 </body>
 
 </html>
