@@ -44,14 +44,14 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-12">
-                            <form action="index.html" method="post" class="tm-login-form">
+                            <form action="index.html" method="post" class="tm-login-form" id="loginForm">
                                 <div class="input-group">
                                     <label for="username" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Username</label>
-                                    <input name="username" type="text" class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7" id="username" value="admin" required>
+                                    <input name="username" type="text" class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7" id="username" autocomplete="username" required>
                                 </div>
                                 <div class="input-group mt-3">
                                     <label for="password" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Password</label>
-                                    <input name="password" type="password" class="form-control validate" id="password" value="1234" required>
+                                    <input name="password" type="password" class="form-control validate" id="password" autocomplete="current-password" required>
                                 </div>
                                 <div class="input-group mt-3">
                                     <button type="submit" class="btn btn-primary d-inline-block mx-auto">Login</button>
@@ -74,6 +74,37 @@
             </div>
         </footer>
     </div>
+    <script>
+        (function () {
+            sessionStorage.removeItem('dashboardAuthenticated');
+
+            const form = document.getElementById('loginForm');
+            const fields = [document.getElementById('username'), document.getElementById('password')];
+
+            fields.forEach(function (field) {
+                field.addEventListener('input', function () {
+                    field.setCustomValidity('');
+                });
+            });
+
+            form.addEventListener('submit', function (event) {
+                const emptyField = fields.find(function (field) {
+                    return field.value.trim() === '';
+                });
+
+                if (emptyField) {
+                    event.preventDefault();
+                    emptyField.setCustomValidity('Please enter your ' + emptyField.name + '.');
+                    emptyField.reportValidity();
+                    return;
+                }
+
+                event.preventDefault();
+                sessionStorage.setItem('dashboardAuthenticated', 'true');
+                window.location.assign('index.html');
+            });
+        }());
+    </script>
 </body>
 
 </html>

@@ -5,6 +5,18 @@
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            function requireLogin() {
+                if (sessionStorage.getItem('dashboardAuthenticated') !== 'true') {
+                    window.location.replace('login.html');
+                }
+            }
+
+            requireLogin();
+            window.addEventListener('pageshow', requireLogin);
+        }());
+    </script>
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard Admin Template by Tooplate.com</title>
     <!--
